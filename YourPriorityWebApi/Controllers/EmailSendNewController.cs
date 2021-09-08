@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -11,27 +11,13 @@ using YourPriorityWebApi.Models;
 
 namespace YourPriorityWebApi.Controllers
 {
-    [AllowCrossSite]
-    public class EmailController : Controller
+    public class EmailSendNewController : ApiController
     {
-
-        public string Get()
+        //Get action methods of the previous section
+        [AllowCrossSiteJson]
+        public IHttpActionResult PostNewEmail(EmailBody email)
         {
-            return "Welcome to Web Api";
-        }
-
-        public List<string> Get(int ID)
-        {
-            return new List<string>
-            {
-                "Data1",
-                "Data2"
-            };
-        }
-        
-        public string PostEmail(EmailBody email)
-        {
-
+            /*var test = JsonConvert.DeserializeObject<EmailBody>(jsons);*/
             try
             {
                 string body = string.Empty;
@@ -78,26 +64,16 @@ namespace YourPriorityWebApi.Controllers
                     _smtp.Send(_mailmsg);
                 }
 
-                //var message = Request.CreateResponse(HttpStatusCode.Created);
+                var message = Request.CreateResponse(HttpStatusCode.Created);
 
-                return "Successfully sent";
 
             }
             catch (Exception ex)
             {
-                /*return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);*/
-                return "Request Denied";
+                var message = Request.CreateResponse(HttpStatusCode.Created);
+
             }
-        }
-
-        [AllowCrossSiteJson]
-        [System.Web.Mvc.HttpPost]
-        public JsonResult Post(string jsons)
-        {
-
-            var test = JsonConvert.DeserializeObject<EmailBody>(jsons);
-            var resEmail = PostEmail(test);
-            return Json(resEmail, JsonRequestBehavior.AllowGet);
+            return Ok();
         }
     }
 }

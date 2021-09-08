@@ -1,36 +1,55 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Data;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
+using System.Text;
 using System.Web.Http;
-using System.Web.Mvc;
-using Newtonsoft.Json;
 using YourPriorityWebApi.Models;
 
 namespace YourPriorityWebApi.Controllers
 {
-    [AllowCrossSite]
-    public class EmailController : Controller
+    public class WebApiController : ApiController
     {
-
-        public string Get()
+        // GET api/<controller>
+        public IEnumerable<string> Get()
         {
-            return "Welcome to Web Api";
+            return new string[] { "value1", "value2" };
         }
 
-        public List<string> Get(int ID)
-        {
-            return new List<string>
-            {
-                "Data1",
-                "Data2"
-            };
-        }
         
-        public string PostEmail(EmailBody email)
+
+        // GET api/<controller>/5
+        public string Get(int id)
         {
+            return "value";
+        }
+
+        // POST api/<controller>
+        //public void Post([FromBody] string value)
+        //{
+        //}
+        
+        [HttpGet, HttpPost]
+        public HttpResponseMessage MessagePost([FromBody] EmailBody email, HttpRequestMessage request)
+        {
+            /*//JToken postData = new JToken();
+            // Initialization
+            HttpResponseMessage response = null;
+            EmailBody requestObj = JsonConvert.DeserializeObject<EmailBody>(postData.ToString());
+            DataTable responseObj = new DataTable();
+            string json = string.Empty;
+
+            json = JsonConvert.SerializeObject(responseObj);
+            response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+
+            return response;*/
 
             try
             {
@@ -40,6 +59,7 @@ namespace YourPriorityWebApi.Controllers
                 {
                     body = reader.ReadToEnd();
                 }*/
+
                 body = "{Name}<br>{Email}<br>{Phone}<br>{Regarding}<br>{Office}<br>{Refference}<br>{Message}";
                 body = body.Replace("{Name}", email.Name);
                 body = body.Replace("{Email}", email.Email);
@@ -78,26 +98,32 @@ namespace YourPriorityWebApi.Controllers
                     _smtp.Send(_mailmsg);
                 }
 
-                //var message = Request.CreateResponse(HttpStatusCode.Created);
+                var message = Request.CreateResponse(HttpStatusCode.Created);
 
-                return "Successfully sent";
 
             }
             catch (Exception ex)
             {
-                /*return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);*/
-                return "Request Denied";
+                var message = Request.CreateResponse(HttpStatusCode.Created);
+
             }
+            HttpResponseMessage response = null;
+            string json = string.Empty;
+            response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+
+            return response;
         }
 
-        [AllowCrossSiteJson]
-        [System.Web.Mvc.HttpPost]
-        public JsonResult Post(string jsons)
+        // PUT api/<controller>/5
+        public void Put(int id, [FromBody] string value)
         {
+        }
 
-            var test = JsonConvert.DeserializeObject<EmailBody>(jsons);
-            var resEmail = PostEmail(test);
-            return Json(resEmail, JsonRequestBehavior.AllowGet);
+        // DELETE api/<controller>/5
+        public void Delete(int id)
+        {
         }
     }
 }
